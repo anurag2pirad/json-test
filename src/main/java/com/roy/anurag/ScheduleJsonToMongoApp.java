@@ -65,6 +65,8 @@ public class ScheduleJsonToMongoApp {
 		String timeZone = isr.getSchedule().getTimeZone();
 		String by = isr.getSchedule().getRepeat().getBy();
 		
+		ArrayList<String> allTimes = new ArrayList<String>();
+		
 		if (by.equals("cron")) {
 			Cron cron = isr.getSchedule().getRepeat().getCron();
 			//ArrayList<String> month = new ArrayList<String>(Arrays.asList(cron.getMonth().split(",")));
@@ -79,8 +81,6 @@ public class ScheduleJsonToMongoApp {
 				}
 			}
 			
-			ArrayList<String> allTimes = new ArrayList<String>();
-			
 			for (String hh : hour) {
 				for (String mm : minute) {
 					if (hh.length() == 1)
@@ -88,18 +88,48 @@ public class ScheduleJsonToMongoApp {
 					if (mm.length() == 1)
 						mm = "0" + mm;
 					
-					allTimes.add(hh + ":" + mm);
+					allTimes.add(hh + ":" + mm + ":00");
 				}
 			}
-			
-			System.out.println(allTimes);
 			
 		} else if (by.equals("minutes")) {
 			
 			int every = isr.getSchedule().getRepeat().getEvery();
 			
 			String startTime = isr.getSchedule().getStartTime();
+			String[] values = startTime.split(":");
+			int startTimeInMillis = Integer.valueOf(values[0])*3600  + Integer.valueOf(values[1])*60 + Integer.valueOf(values[2]);
+			//System.out.println(startTimeInMillis);
+			int i = startTimeInMillis;
+			System.out.println("i before: " + i);
+			for (; i < 86400; i = i + every*60) {
+				int secondsLeft = i % 3600 % 60;
+			    int minutes = (int) Math.floor(i % 3600 / 60);
+			    int hours = (int) Math.floor(i / 3600);
+
+			    String HH = hours < 10 ? "0" + String.valueOf(hours) : String.valueOf(hours);
+			    String MM = minutes < 10 ? "0" + String.valueOf(minutes) : String.valueOf(minutes);
+			    String SS = secondsLeft < 10 ? "0" + String.valueOf(secondsLeft) : String.valueOf(secondsLeft);
+
+			    allTimes.add(HH + ":" + MM + ":" + SS);
+			}
+			System.out.println("i after: " + i);
+			i = i - 86400;
+			for (; i < startTimeInMillis; i = i + every*60) {
+				int secondsLeft = i % 3600 % 60;
+			    int minutes = (int) Math.floor(i % 3600 / 60);
+			    int hours = (int) Math.floor(i / 3600);
+
+			    String HH = hours < 10 ? "0" + String.valueOf(hours) : String.valueOf(hours);
+			    String MM = minutes < 10 ? "0" + String.valueOf(minutes) : String.valueOf(minutes);
+			    String SS = secondsLeft < 10 ? "0" + String.valueOf(secondsLeft) : String.valueOf(secondsLeft);
+
+			    allTimes.add(HH + ":" + MM + ":" + SS);
+			}
+			System.out.println("i after after: " + i);
 		}
+		
+		System.out.println(allTimes);
 		
 		TimeZone zone = TimeZone.getTimeZone(timeZone); 
 		//System.out.println(zone);
