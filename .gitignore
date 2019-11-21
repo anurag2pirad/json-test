@@ -1,3 +1,4 @@
 
 target/classes/META-INF/maven/com.roy.anurag/json-test/pom.properties
 *.class
+/target/

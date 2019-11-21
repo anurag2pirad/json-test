@@ -30,7 +30,7 @@ public class ScheduleJsonToMongoApp {
 		ObjectMapper mapper = new ObjectMapper();
 		
 		try {
-			Object obj = parser.parse(new BufferedReader(new FileReader("C:\\Users\\anurag\\Desktop\\json\\listScheduleJob.json")));
+			Object obj = parser.parse(new BufferedReader(new FileReader("/Users/anurag/Downloads/listScheduleJob.json")));
 			JSONArray jsonArray = (JSONArray) obj;
 			
 			for (Object arrayElement : jsonArray) {
@@ -100,8 +100,8 @@ public class ScheduleJsonToMongoApp {
 			String[] values = startTime.split(":");
 			int startTimeInMillis = Integer.valueOf(values[0])*3600  + Integer.valueOf(values[1])*60 + Integer.valueOf(values[2]);
 			//System.out.println(startTimeInMillis);
+			
 			int i = startTimeInMillis;
-			System.out.println("i before: " + i);
 			for (; i < 86400; i = i + every*60) {
 				int secondsLeft = i % 3600 % 60;
 			    int minutes = (int) Math.floor(i % 3600 / 60);
@@ -113,7 +113,7 @@ public class ScheduleJsonToMongoApp {
 
 			    allTimes.add(HH + ":" + MM + ":" + SS);
 			}
-			System.out.println("i after: " + i);
+
 			i = i - 86400;
 			for (; i < startTimeInMillis; i = i + every*60) {
 				int secondsLeft = i % 3600 % 60;
@@ -126,7 +126,6 @@ public class ScheduleJsonToMongoApp {
 
 			    allTimes.add(HH + ":" + MM + ":" + SS);
 			}
-			System.out.println("i after after: " + i);
 		}
 		
 		System.out.println(allTimes);
