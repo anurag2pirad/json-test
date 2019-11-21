@@ -53,7 +53,7 @@ public class ScheduleJsonToMongoApp {
 		
 	}
 	
-	public static void generateFlattenedInterface (InterfaceScheduleRaw isr, long startTime, long endTime) {
+	public static void generateFlattenedInterface (InterfaceScheduleRaw isr, long start, long end) {
 		
 		List<InterfaceScheduleFlattened> result = new ArrayList<InterfaceScheduleFlattened>();
 		
@@ -67,11 +67,11 @@ public class ScheduleJsonToMongoApp {
 		
 		if (by.equals("cron")) {
 			Cron cron = isr.getSchedule().getRepeat().getCron();
-			//ArrayList<String> month = new ArrayList(Arrays.asList(cron.getMonth().split(",")));
-			ArrayList<String> minute = new ArrayList(Arrays.asList(cron.getMinute().split(",")));
-			//ArrayList<String> day = new ArrayList(Arrays.asList(cron.getDay().split(",")));
-			//ArrayList<String> dayOfWeek = new ArrayList(Arrays.asList(cron.getDayOfWeek().split(",")));
-			ArrayList<String> hour = new ArrayList(Arrays.asList(cron.getHour().split(",")));
+			//ArrayList<String> month = new ArrayList<String>(Arrays.asList(cron.getMonth().split(",")));
+			ArrayList<String> minute = new ArrayList<String>(Arrays.asList(cron.getMinute().split(",")));
+			//ArrayList<String> day = new ArrayList<String>(Arrays.asList(cron.getDay().split(",")));
+			//ArrayList<String> dayOfWeek = new ArrayList<String>(Arrays.asList(cron.getDayOfWeek().split(",")));
+			ArrayList<String> hour = new ArrayList<String>(Arrays.asList(cron.getHour().split(",")));
 			if (hour.contains("*")) {
 				hour.clear();
 				for (int i = 0; i < 24; i++) {
@@ -98,6 +98,7 @@ public class ScheduleJsonToMongoApp {
 			
 			int every = isr.getSchedule().getRepeat().getEvery();
 			
+			String startTime = isr.getSchedule().getStartTime();
 		}
 		
 		TimeZone zone = TimeZone.getTimeZone(timeZone); 
