@@ -4,8 +4,13 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
@@ -24,13 +29,13 @@ import com.roy.anurag.InterfaceScheduleRaw.Schedule.Repeat.Cron;
 
 public class ScheduleJsonToMongoApp {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws java.text.ParseException {
 		
 		JSONParser parser = new JSONParser();
 		ObjectMapper mapper = new ObjectMapper();
 		
 		try {
-			Object obj = parser.parse(new BufferedReader(new FileReader("/Users/anurag/Downloads/listScheduleJob.json")));
+			Object obj = parser.parse(new BufferedReader(new FileReader("C:\\Users\\anurag\\Desktop\\json\\listScheduleJob.json")));
 			JSONArray jsonArray = (JSONArray) obj;
 			
 			for (Object arrayElement : jsonArray) {
@@ -53,7 +58,7 @@ public class ScheduleJsonToMongoApp {
 		
 	}
 	
-	public static void generateFlattenedInterface (InterfaceScheduleRaw isr, long start, long end) {
+	public static void generateFlattenedInterface (InterfaceScheduleRaw isr, long start, long end) throws java.text.ParseException {
 		
 		List<InterfaceScheduleFlattened> result = new ArrayList<InterfaceScheduleFlattened>();
 		
@@ -65,7 +70,10 @@ public class ScheduleJsonToMongoApp {
 		String timeZone = isr.getSchedule().getTimeZone();
 		String by = isr.getSchedule().getRepeat().getBy();
 		
+		TimeZone zone = TimeZone.getTimeZone(timeZone);
+		
 		ArrayList<String> allTimes = new ArrayList<String>();
+		ArrayList<String> allTimes2 = new ArrayList<String>();
 		
 		if (by.equals("cron")) {
 			Cron cron = isr.getSchedule().getRepeat().getCron();
@@ -128,10 +136,36 @@ public class ScheduleJsonToMongoApp {
 			}
 		}
 		
-		System.out.println(allTimes);
+//		System.out.println(allTimes);
 		
-		TimeZone zone = TimeZone.getTimeZone(timeZone); 
-		//System.out.println(zone);
+		for (long x = start; x < end; x = x + 86400000) {
+			DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTimeInMillis(x);
+			String datePrefix = formatter.format(calendar.getTime());
+			allTimes.parallelStream()
+				.forEach(t -> allTimes2.add(datePrefix + " " + t + " " + zone.getDisplayName()));
+		}
+		
+//		System.out.println(allTimes2);
+		
+		SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss z");
+		
+		for (String t : allTimes2) {
+			Date date = null;
+			try {
+				date = df.parse(t);
+			} catch (java.text.ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			long epoch = date.getTime();
+			result.add(new InterfaceScheduleFlattened(taskId, taskName, pipelineName, pipelineFolder, "DF", epoch));
+		}
+		
+		System.out.println(result);
+		
 	}
 
 }
